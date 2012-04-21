@@ -62,10 +62,11 @@ public class BitLottoVerify
         System.out.println("Mixer hash: " + mixer_hash);
 
         Map<String, String> draw_map = getDrawTxSet(addr, mixer_hash);
-        System.out.println("Total tickets: " + draw_map.size());
+        
+        System.out.println();
         for(Map.Entry<String, String> me : draw_map.entrySet())
         {
-            System.out.println(me.getKey() + ": " + me.getValue());
+            System.out.println(me.getKey().substring(0,8) + ": " + me.getValue());
         }
 
     }
