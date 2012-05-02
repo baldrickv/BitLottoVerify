@@ -76,10 +76,43 @@ public class BitLottoVerify
         return "http://blockchain.info/address/" + addr + "?format=json&offset=" + offset;
     }
 
+    public static Map<String, Long> getPaymentsBlockExplorer(String addr)
+            throws Exception
+    {
+        URL u = new URL("http://blockexplorer.com/address/" + addr);
+        Scanner scan = new Scanner(u.openStream());
+
+        TreeMap<String,Long> map = new TreeMap<String,Long>();
+
+        while(scan.hasNextLine())
+        {
+            String line = scan.nextLine();
+            StringTokenizer stok = new StringTokenizer(line, "\"#");
+            while(stok.hasMoreTokens())
+            {
+                String token=stok.nextToken();
+                if (token.startsWith("/tx/"))
+                {
+                    String tx = token.substring(4);
+                    line = scan.nextLine();
+                    line = scan.nextLine();
+                    StringTokenizer stok2 = new StringTokenizer(line, "<>");
+                    stok2.nextToken();
+                    double amt = Double.parseDouble(stok2.nextToken());
+                    long amt_l = (long)Math.round(amt*1e8);
+                    map.put(tx, amt_l);
+
+                    
+               }
+           }
+        }
+        return map;
+    }
+
     /** 
      * Returns a map of TXID to amount for the given address
      */
-    public static Map<String, Long> getPayments(String addr)
+    public static Map<String, Long> getPaymentsBlockChainInfo(String addr)
         throws Exception
     {
         Map<String, Long> map = new TreeMap<String, Long>();
@@ -141,7 +174,7 @@ public class BitLottoVerify
     public static Map<String,String> getDrawTxSet(String addr, String mixer_hash)
         throws Exception
     {
-        Map<String, Long> tx_map = getPayments(addr);
+        Map<String, Long> tx_map = getPaymentsBlockExplorer(addr);
 
         int transactions=0;
         int tickets=0;
