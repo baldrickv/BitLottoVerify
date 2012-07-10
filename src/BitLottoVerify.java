@@ -44,24 +44,30 @@ public class BitLottoVerify
 
     public static void main(String args[]) throws Exception
     {
-        if (args.length != 3)
+        if (args.length < 3)
         {
-            System.out.println("Args: addr blockhash megamillions");
+            System.out.println("Args: blockhash megamillions addrs");
             System.out.println("Example: 14avxyPW5PgA68kGkDkY1mCGPP8zqkywEx 000000000000042c91c9de46f802524ab1c2296923a72b55fac2d2c6fd7f4741 113538415240"); 
             System.exit(1);
         }
 
-        String addr = args[0];
-        String blockhash = args[1];
-        String megamillions = args[2];
+        String blockhash = args[0];
+        String megamillions = args[1];
 
         String mixer = blockhash + megamillions;
         String mixer_hash=sha256(blockhash + megamillions);
-        System.out.println("Draw address: " + addr);
         System.out.println("Mixer: " + mixer);
         System.out.println("Mixer hash: " + mixer_hash);
+        TreeMap<String, String> draw_map = new TreeMap<String, String>();
 
-        Map<String, String> draw_map = getDrawTxSet(addr, mixer_hash);
+        for(int i=2; i<args.length; i++)
+        {
+            String addr=args[i];
+            System.out.println("Draw address: " + addr);
+
+            draw_map.putAll(getDrawTxSet(addr, mixer_hash));
+
+        }
         
         System.out.println();
         for(Map.Entry<String, String> me : draw_map.entrySet())
@@ -174,7 +180,7 @@ public class BitLottoVerify
     public static Map<String,String> getDrawTxSet(String addr, String mixer_hash)
         throws Exception
     {
-        Map<String, Long> tx_map = getPaymentsBlockExplorer(addr);
+        Map<String, Long> tx_map = getPaymentsBlockChainInfo(addr);
 
         int transactions=0;
         int tickets=0;
